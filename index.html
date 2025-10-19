@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envelope com Carta e Galeria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: "Comic Neue", cursive;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            /* faz descer */
+            height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+            /* distância do rodapé */
+        }
+
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #eb7885;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            perspective: 1200px;
+            transition: transform 0.8s ease;
+            z-index: 10;
+            margin-bottom: 20px;
+            /* ajuste adicional de distância do rodapé */
+        }
+
+        .lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ff8896;
+            transform-origin: top center;
+            transition: transform 1s ease;
+            z-index: 3;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .cover {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid #f5b5bb;
+            z-index: 2;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .envelope.open .lid {
+            transform: rotateX(-180deg);
+        }
+
+        .carta {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translate(-50%, 50%) scale(0.9);
+            width: 120%;
+            max-width: 320px;
+            height: 240px;
+            background: #fdf7e3;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            transition: transform 1.2s ease, opacity 1s ease, box-shadow 0.3s ease, filter 0.6s ease;
+            z-index: 1;
+            background-image: repeating-linear-gradient(0deg,
+                    rgba(255, 255, 255, 0.15) 0px,
+                    rgba(255, 255, 255, 0.15) 1px,
+                    transparent 2px,
+                    transparent 18px);
+            background-blend-mode: overlay;
+        }
+
+        .envelope.open .carta {
+            transform: translate(-50%, -120%) scale(1);
+            opacity: 1;
+            z-index: 5;
+            animation: papelOndulado 1.2s ease forwards;
+        }
+
+        .envelope.close .carta {
+            transform: translate(-50%, 50%) scale(0.9);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        @keyframes papelOndulado {
+            0% {
+                transform: translate(-50%, 50%) scale(0.9) rotateX(0deg) rotateZ(0deg);
+            }
+
+            20% {
+                transform: translate(-50%, -50%) scale(1) rotateX(5deg) rotateZ(-2deg);
+            }
+
+            40% {
+                transform: translate(-50%, -80%) scale(1) rotateX(-3deg) rotateZ(2deg);
+            }
+
+            60% {
+                transform: translate(-50%, -110%) scale(1) rotateX(3deg) rotateZ(-1deg);
+            }
+
+            80% {
+                transform: translate(-50%, -120%) scale(1) rotateX(-1deg) rotateZ(1deg);
+            }
+
+            100% {
+                transform: translate(-50%, -120%) scale(1) rotateX(0deg) rotateZ(0deg);
+            }
+        }
+
+        .carta.reagir {
+            animation: papelReagir 0.6s ease forwards;
+        }
+
+        @keyframes papelReagir {
+            0% {
+                transform: translate(-50%, -120%) scale(1) rotate(0deg);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            }
+
+            50% {
+                transform: translate(-50%, -122%) scale(1.01) rotate(1deg);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            }
+
+            100% {
+                transform: translate(-50%, -120%) scale(1) rotate(0deg);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .carta.brilho {
+            filter: drop-shadow(0 0 25px #fff) brightness(1.2);
+            transition: filter 0.3s ease;
+        }
+
+        .carta p {
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+            color: #2d2d2d;
+            font-size: 1rem;
+        }
+
+        .galeria {
+            display: none;
+            position: absolute;
+            top: 70%;
+            /* descida da galeria */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 260px;
+            height: 260px;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .galeria.show {
+            display: flex;
+        }
+
+        .galeria img {
+            position: absolute;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border: 6px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.6s ease, z-index 0.6s ease, opacity 0.6s ease;
+            cursor: pointer;
+        }
+
+        .galeria img:nth-child(1) {
+            transform: rotate(5deg);
+            z-index: 5;
+        }
+
+        .galeria img:nth-child(2) {
+            transform: rotate(-5deg);
+            z-index: 4;
+        }
+
+        .galeria img:nth-child(3) {
+            transform: rotate(10deg);
+            z-index: 3;
+        }
+
+        .galeria img:nth-child(4) {
+            transform: rotate(-10deg);
+            z-index: 2;
+        }
+
+        .galeria img:nth-child(5) {
+            transform: rotate(3deg);
+            z-index: 1;
+        }
+
+        @media (max-width: 450px) {
+            body {
+                padding-bottom: 30px;
+            }
+
+            .envelope {
+                width: 220px;
+                height: 150px;
+            }
+
+            .lid {
+                border-left: 110px solid transparent;
+                border-right: 110px solid transparent;
+                border-top: 75px solid #ff8896;
+            }
+
+            .cover {
+                border-left: 110px solid transparent;
+                border-right: 110px solid transparent;
+                border-bottom: 75px solid #f5b5bb;
+            }
+
+            .carta {
+                width: 140%;
+                height: 265px;
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+
+            .envelope.open .carta {
+                transform: translate(-50%, -100%) scale(1);
+            }
+
+            .galeria {
+                width: 180px;
+                height: 180px;
+                top: 75%;
+            }
+
+            .galeria img {
+                border: 4px solid #fff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="envelope" id="envelope">
+        <div class="lid" id="lid"></div>
+        <div class="cover"></div>
+        <div class="carta" id="carta">
+            <p><strong>Oie, moço! Tudo bem?</strong></p>
+            <p>Espero que você não esteja bicudo hoje, porque eu amo te ver sorrindo.</p>
+            <p>Gosto do seu sorriso, dos seus olhos, do seu jeito, do seu caráter... E, por mais que você diga que só
+                sai com você porque é gostoso, você sabe que não é por isso.</p>
+            <p>Você é engraçado, fofo, e eu amo estar com você — amo rir com você e, principalmente, amo você.</p>
+            <p>Você disse que ficou nervoso ao escrever a sua carta. Se quiser saber da minha experiência, estou
+                escrevendo essa de coração tranquilo, com muito carinho e certeza do que sinto.</p>
+            <p>Tenho fé de que tudo vai dar certo entre nós e que um dia ainda vamos morar juntinhos (ui ui ui 😏).</p>
+            <p>Fiz cada linha dessa carta virtual com muito amor (e sim, se quiser ver o código-fonte depois, eu deixo
+                kkkkkk). Espero que você goste!</p>
+            <p>Mesmo que eu não seja sempre boa com palavras, quero que saiba que estou sempre pensando em você com
+                muito carinho.</p>
+            <p><strong>Beijooos, te amo, meu marrento! ❤️</strong></p>
+        </div>
+    </div>
+
+
+    <div class="galeria" id="galeria">
+        <img src="img/1.png" alt="">
+        <img src="img/2.png" alt="">
+        <img src="img/3.png" alt="">
+        <img src="img/4.png" alt="">
+        <img src="img/5.png" alt="">
+    </div>
+
+    <script>
+        const envelope = document.getElementById("envelope");
+        const galeria = document.getElementById("galeria");
+        const carta = document.getElementById("carta");
+        let aberto = false;
+        let cliquesGaleria = 0;
+
+        function fecharGaleria() {
+            const imgs = Array.from(galeria.children);
+            imgs.forEach((img, i) => {
+                setTimeout(() => {
+                    img.style.transform = `translateY(-200%) rotate(${Math.random() * 60 - 30}deg)`;
+                    img.style.opacity = 0;
+                }, i * 100);
+            });
+            setTimeout(() => galeria.classList.remove("show"), imgs.length * 100 + 400);
+        }
+
+        envelope.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!aberto) {
+                envelope.classList.add("open");
+                envelope.classList.remove("close");
+                galeria.classList.add("show");
+                cliquesGaleria = 0;
+                Array.from(galeria.children).forEach(img => {
+                    img.style.opacity = 1;
+                    img.style.transform = '';
+                });
+                aberto = true;
+            } else {
+                envelope.classList.remove("open");
+                envelope.classList.add("close");
+                carta.classList.remove("brilho");
+                if (galeria.classList.contains("show")) fecharGaleria();
+                aberto = false;
+            }
+        });
+
+        galeria.addEventListener("click", (e) => {
+            e.stopPropagation();
+            cliquesGaleria++;
+            carta.classList.add("reagir");
+            setTimeout(() => carta.classList.remove("reagir"), 600);
+
+            const imagens = Array.from(galeria.children);
+            const primeira = imagens[0];
+
+            primeira.style.transform = "translate(130%,-50%) rotate(15deg)";
+            primeira.style.zIndex = 0;
+
+            setTimeout(() => {
+                primeira.style.transition = "none";
+                primeira.style.transform = `rotate(${5 + Math.random() * 5}deg)`;
+                galeria.appendChild(primeira);
+                imagens.forEach((img, index) => {
+                    img.style.zIndex = imagens.length - index;
+                    img.style.transition = "transform 0.6s ease, z-index 0.6s ease, opacity 0.6s ease";
+                });
+
+                if (cliquesGaleria >= imagens.length) {
+                    carta.classList.add("brilho");
+                    imagens.forEach((img, i) => {
+                        setTimeout(() => {
+                            img.style.transform = `translateY(-200%) rotate(${Math.random() * 60 - 30}deg)`;
+                            img.style.opacity = 0;
+                        }, i * 150);
+                    });
+                    setTimeout(() => {
+                        galeria.classList.remove("show");
+                        carta.classList.remove("brilho");
+                    }, imagens.length * 150 + 600);
+                }
+            }, 600);
+        });
+
+        document.body.addEventListener("click", () => {
+            if (aberto && galeria.classList.contains("show")) {
+                fecharGaleria();
+            }
+        });
+    </script>
+</body>
+
+</html>
